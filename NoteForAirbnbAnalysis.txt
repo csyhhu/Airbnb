@@ -1,0 +1,9 @@
+
+1. Almost 90% of users fall into two categories: NDF, US
+2. User with non-date_first_booking is NDF, therefore no need to predict whether it is NDF.
+3. Because of a majority of US-user, it is better to tell US-user from others at first in order to avoid too generilization. 
+4. The majority of the training data provided comes from the latest 2 years. In fact, if we limited the training data to accounts created from January 2013 onwards, we would still be including over 70% of all the data. This matters because, referring back to the notes provided by Airbnb, if we want to use the data in sessions.csv we would be limited to data from January 2014 onwards. Again looking at the numbers, this means that even though the sessions.csv data only covers 11% of the time period (6 out of 54 months), it still covers over 30% of the training data – or 76,466 users.
+5. Recent data is likely to be the most useful for building our model.
+
+Reference:
+1. http://brettromero.com/wordpress/data-science-a-kaggle-walkthrough-understanding-the-data/
