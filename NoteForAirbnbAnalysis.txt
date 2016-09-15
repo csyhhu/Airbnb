@@ -1,9 +1,26 @@
 
+Data Pre-processing Steps:
+
 1. Almost 90% of users fall into two categories: NDF, US
 2. User with non-date_first_booking is NDF, therefore no need to predict whether it is NDF.
 3. Because of a majority of US-user, it is better to tell US-user from others at first in order to avoid too generilization. 
 4. The majority of the training data provided comes from the latest 2 years. In fact, if we limited the training data to accounts created from January 2013 onwards, we would still be including over 70% of all the data. This matters because, referring back to the notes provided by Airbnb, if we want to use the data in sessions.csv we would be limited to data from January 2014 onwards. Again looking at the numbers, this means that even though the sessions.csv data only covers 11% of the time period (6 out of 54 months), it still covers over 30% of the training data – or 76,466 users.
 5. Recent data is likely to be the most useful for building our model.
+6. To validate our model, we use 10-fold cross validation. In this way, each data can be used both to train and validate the model.
+7. booking month may be a useful feature
+8. If the difference between booking date and account creation date is less than 2, namely, 0 or 1,US-users tend to have larger ratio than Non-US-users. In this case, we came up with a useful feature that if difference between booking date and account creation date is less than 2,the feature vector is [1, 0],otherwise [0, 1]. The date difference < 11 count most of the date difference distribution, and it is the values of these date differences that have an evident different properties among all the countries. So we created a 12-dimension vector, used the index as date difference itself if it was <= 10 or used index 11 otherwise. This feature representation gave us a good prediction result.
+9. come up with a age feature vector. Moreover, there are some outliers in the age set. For example, some users input 2014 as age instead of 1 years-old.(It’s a actual weird case, because this user doesn’t only enter the wrong number of age, but also appears too young to book on-line. To handle this case, we preprocessed data to discard users with age over 100, or under 5.
+10. The baseline for model performance must be established. Since the NDF and US count over 80 percent of the training set, the baseline only predicts these two countries. It predicts the NDF and US alternatively, like NDF, US, NDF, US, ...etc. The prediction score on the validation set was 0.78640. It means that 0.7864 is the minimum accuracy ratio we must achieve and any model adjustment must achieve good positive increase on the score.
+11. We group three parameters of first device type, first browser and signup-app together to reflect users' web browsing preferences since analysing them separately won't  yield much significant results.
+12. For the parameters of affiliate provider and first affiliate tracked, their separation gave us trivial results, so we combine them altogether as a 2- dimension vector, which could also reflect a user’s habit.
+13. We can develop a scoring method for evaluating the accuracy of our predictions. this validation method is that for every user’s prediction, we can list at most 5 countries in order. We compare them with the validation set in this order. That is, compare the first country with the country in the validation set, if they are the same, calculate the score(in this case, it is 1) and return. There is no need to consider the rest countries. If they are different, then compare the second country with that in the validation set, if same, calculate the score and return, otherwise turn to the third, fourth, and even the last country to compare. The position of the country in the list indicates the confidence we give to that country. The more front the position of country is in the list, the more likely we think it is the result. 
+
+Methodologies:
+
+1. The data is unbalanced because US counts for a large proportion of the data. If we used multiclass classification classifiers directly, the performance was a disaster. Therefore,
+we built a two-level classifier to separate the US and other countries first.
+
+2. The first level is a binary classifier with Voting Mechanism combining linear, logistic and polynomial regression. The second level is a multiclass classifier which is the combination of SVM and multi-class one-against-rest logistic classification: combine, sort, get top 5 unrepeated countries with highest probabilities.
 
 Reference:
 1. http://brettromero.com/wordpress/data-science-a-kaggle-walkthrough-understanding-the-data/
