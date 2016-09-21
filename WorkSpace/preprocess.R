@@ -1,7 +1,6 @@
 #setwd('/home/aurelius/Kaggle/Airbnb')
 setwd('/Users/shangyu/Documents/Kaggle/Airbnb')
 source('WorkSpace/myOneHot.R')
-library('e1071')
 
 # Read in the dataset
 train_users <- read.table('train_users_2.csv',sep = ',', header = TRUE)
@@ -89,5 +88,10 @@ traininglabel <- myOneHot(destination_hash[train_users$country_destination], len
 train_users_features <- cbind(train_users_features, signup_method_onehot, gender_onehot, language_onehot,
                               affiliate_channel_onehot, affiliate_provider_onehot, first_affiliate_tracked_onehot,
                               signup_app_onehot, first_device_type_onehot, first_browser_onehot)
+# Save the feature
+write.csv(train_users_features, 'trainX.csv')
+# Save the label
+write.csv(traininglabel, 'trainY.csv')
+
 # Train the SVM Model
-model <- svm(train_users_features, traininglabel)
+# model <- svm(train_users_features, traininglabel)
