@@ -1,5 +1,7 @@
-setwd('/home/aurelius/Kaggle/Airbnb')
+#setwd('/home/aurelius/Kaggle/Airbnb')
+setwd('/Users/shangyu/Documents/Kaggle/Airbnb')
 source('WorkSpace/myOneHot.R')
+library('e1071')
 
 # Read in the dataset
 train_users <- read.table('train_users_2.csv',sep = ',', header = TRUE)
@@ -42,6 +44,11 @@ first_browser <- unique(train_users$first_browser)
 first_browser_hash <- c(1:length(first_browser))-1
 names(first_browser_hash) <- first_browser
 
+# Destinations, also the label of the training
+destination <- unique(train_users$country_destination)
+destination_hash <- c(1: length(destination)) - 1
+names(destination_hash) <- destination
+
 nulflag <- train_users[1,4]
 # Attain the samples that don't have data_first_booking
 train_users <- train_users[!train_users$date_first_booking == nulflag, ]
@@ -54,7 +61,7 @@ train_users$age <- as.integer(floor(train_users$age))
 train_users$age <- train_users$age %/% 5
 
 # Create the train user's feature, slicing id and age as the initial
-train_users_features <- as.matrix(train_users[c('id','age')]) 
+train_users_features <- as.matrix(train_users[c('age')]) 
 
 # Do the one-hot coding for other paramaters
 # For signup method
@@ -75,9 +82,12 @@ signup_app_onehot <- myOneHot(signup_app_hash[train_users$signup_app], length(si
 first_device_type_onehot <- myOneHot(first_device_type_hash[train_users$first_device_type], length(first_device_type))
 # first_browser
 first_browser_onehot <- myOneHot(first_browser_hash[train_users$first_browser], length(first_browser))
+# destination
+traininglabel <- myOneHot(destination_hash[train_users$country_destination], length(destination))
 
 # Combine all the features
 train_users_features <- cbind(train_users_features, signup_method_onehot, gender_onehot, language_onehot,
                               affiliate_channel_onehot, affiliate_provider_onehot, first_affiliate_tracked_onehot,
                               signup_app_onehot, first_device_type_onehot, first_browser_onehot)
-
+# Train the SVM Model
+model <- svm(train_users_features, traininglabel)
